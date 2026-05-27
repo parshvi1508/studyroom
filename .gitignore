@@ -1,0 +1,10 @@
+venv/
+venv
+.env
+__pycache__/
+.agents
+.agents/
+.vscode
+skills-lock.json
+backend/venv/
+backend/venv/
