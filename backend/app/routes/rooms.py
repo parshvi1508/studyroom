@@ -81,6 +81,11 @@ async def update_room(
             status_code=status.HTTP_403_FORBIDDEN,
             detail=str(exc),
         )
+    except ValueError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail=str(exc),
+        )
     if result is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
