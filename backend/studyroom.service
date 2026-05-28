@@ -1,0 +1,15 @@
+[Unit]
+Description=StudyRoom FastAPI backend
+After=network.target
+
+[Service]
+Type=simple
+User=ubuntu
+WorkingDirectory=/home/ubuntu/studyroom/backend
+EnvironmentFile=/home/ubuntu/studyroom/backend/.env
+ExecStart=/bin/bash /home/ubuntu/studyroom/backend/startup.sh
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

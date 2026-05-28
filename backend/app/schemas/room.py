@@ -28,3 +28,21 @@ class RoomResponse(BaseModel):
     creator_display_name: str
     created_at: datetime
     is_active: bool
+
+
+class MessageResponse(BaseModel):
+    """Schema for GET /rooms/{code}/messages response items."""
+
+    id: uuid.UUID
+    user_id: uuid.UUID
+    display_name: str
+    content: str
+    sent_at: datetime
+
+
+class ActiveSessionResponse(BaseModel):
+    """Schema for GET /rooms/{code}/session/active response."""
+
+    session_id: uuid.UUID
+    started_by: uuid.UUID
+    start_time: datetime
