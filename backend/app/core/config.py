@@ -16,7 +16,6 @@ class Settings(BaseSettings):
     JWT_ALGORITHM: str = "HS256"
     JWT_EXPIRE_MINUTES: int = 60
     FRONTEND_ORIGIN: str = "http://localhost:5173"
-    CORS_ORIGINS: list[str] = ["http://localhost:5173"]
 
     model_config = SettingsConfigDict(
         env_file=".env",

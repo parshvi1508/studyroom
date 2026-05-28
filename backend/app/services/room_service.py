@@ -11,7 +11,6 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.room import Room
-from app.models.session import Session
 from app.models.user import User
 from app.schemas.room import RoomResponse
 
@@ -132,7 +131,6 @@ class RoomService:
 
         Returns updated RoomResponse, or None if room not found.
         Raises PermissionError if caller is not the creator.
-        Raises ValueError if deactivating a room with an active session (ADR-010).
         """
         stmt = (
             select(Room, User.display_name)
@@ -148,17 +146,6 @@ class RoomService:
 
         if room.creator_id != creator_id:
             raise PermissionError("Only the room creator can modify this room")
-
-        if not is_active:
-            active_session_stmt = (
-                select(Session.id)
-                .where(Session.room_id == room.id)
-                .where(Session.status == "active")
-                .limit(1)
-            )
-            active_session = await session.execute(active_session_stmt)
-            if active_session.scalar_one_or_none() is not None:
-                raise ValueError("Cannot archive room with an active session. End the session first.")
 
         room.is_active = is_active
         await session.flush()
