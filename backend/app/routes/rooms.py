@@ -8,8 +8,16 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
 from app.routes.auth import get_current_user_id
-from app.schemas.room import CreateRoomRequest, RoomResponse, UpdateRoomRequest
+from app.schemas.room import (
+    ActiveSessionResponse,
+    CreateRoomRequest,
+    MessageResponse,
+    RoomResponse,
+    UpdateRoomRequest,
+)
+from app.services.message_service import message_service
 from app.services.room_service import room_service
+from app.services.session_service import session_service
 
 logger = logging.getLogger(__name__)
 
@@ -87,3 +95,52 @@ async def update_room(
             detail="Room not found",
         )
     return result
+
+
+@router.get("/{code}/messages", response_model=list[MessageResponse])
+async def get_messages(
+    code: str,
+    user_id: uuid.UUID = Depends(get_current_user_id),
+    db: AsyncSession = Depends(get_db),
+) -> list[MessageResponse]:
+    """Return the 50 most recent messages for a room, oldest first."""
+    room = await room_service.get_by_code(session=db, code=code)
+    if room is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Room not found",
+        )
+    rows = await message_service.get_history(session=db, room_id=room.id)
+    return [
+        MessageResponse(
+            id=row.id,
+            user_id=row.user_id,
+            display_name=row.display_name,
+            content=row.content,
+            sent_at=row.sent_at,
+        )
+        for row in rows
+    ]
+
+
+@router.get("/{code}/session/active", response_model=ActiveSessionResponse | None)
+async def get_active_session(
+    code: str,
+    user_id: uuid.UUID = Depends(get_current_user_id),
+    db: AsyncSession = Depends(get_db),
+) -> ActiveSessionResponse | None:
+    """Return the active session for a room, or null if none is running."""
+    room = await room_service.get_by_code(session=db, code=code)
+    if room is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Room not found",
+        )
+    active = await session_service.get_active(session=db, room_id=room.id)
+    if active is None:
+        return None
+    return ActiveSessionResponse(
+        session_id=active.id,
+        started_by=active.started_by,
+        start_time=active.start_time,
+    )
