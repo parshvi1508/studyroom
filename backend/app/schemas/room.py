@@ -46,3 +46,13 @@ class ActiveSessionResponse(BaseModel):
     session_id: uuid.UUID
     started_by: uuid.UUID
     start_time: datetime
+
+
+class ActivityLogResponse(BaseModel):
+    """Schema for GET /rooms/{code}/activity response items."""
+
+    id: uuid.UUID
+    user_id: uuid.UUID | None
+    event_type: str
+    event_metadata: dict | None
+    occurred_at: datetime
