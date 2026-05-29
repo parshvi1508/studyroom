@@ -141,21 +141,28 @@ class SessionService:
     ) -> DashboardResponse:
         """Return aggregated dashboard data for a user.
 
-        Runs 3 queries (no N+1):
-        1. Aggregate SUM + COUNT on sessions
+        Runs 4 queries (no N+1):
+        1a. SUM(duration_seconds) on ended sessions
+        1b. COUNT on all sessions by user (any status)
         2. Session history with room name via JOIN
         3. COUNT on rooms
         """
-        # Query 1: aggregates from ended sessions
-        agg_stmt = select(
+        # Query 1a: SUM duration from ended sessions only
+        sum_stmt = select(
             func.coalesce(func.sum(Session.duration_seconds), 0),
-            func.count(Session.id),
         ).where(
             Session.started_by == user_id,
             Session.status == "ended",
         )
-        agg_result = await session.execute(agg_stmt)
-        total_seconds, session_count = agg_result.one()
+        sum_result = await session.execute(sum_stmt)
+        (total_seconds,) = sum_result.one()
+
+        # Query 1b: COUNT all sessions by user regardless of status
+        count_stmt = select(func.count(Session.id)).where(
+            Session.started_by == user_id,
+        )
+        count_result = await session.execute(count_stmt)
+        session_count = count_result.scalar_one()
 
         # Query 2: session history with room name (single JOIN, no N+1)
         history_stmt = (
