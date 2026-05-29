@@ -80,15 +80,30 @@ export default function DashboardPage() {
           <>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
               <div className="bg-bg-surface border border-bg-border rounded-lg p-5">
-                <p className="text-text-muted text-xs uppercase tracking-wider mb-2">Study Time</p>
+                <p className="text-text-muted text-xs uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                  <svg className="w-4 h-4 text-accent flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  Study Time
+                </p>
                 <p className="text-3xl font-semibold text-text-primary">{formatDuration(data.total_study_seconds)}</p>
               </div>
               <div className="bg-bg-surface border border-bg-border rounded-lg p-5">
-                <p className="text-text-muted text-xs uppercase tracking-wider mb-2">Sessions</p>
+                <p className="text-text-muted text-xs uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                  <svg className="w-4 h-4 text-accent flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M8 5v14l11-7z" />
+                  </svg>
+                  Sessions
+                </p>
                 <p className="text-3xl font-semibold text-text-primary">{data.session_count}</p>
               </div>
               <div className="bg-bg-surface border border-bg-border rounded-lg p-5">
-                <p className="text-text-muted text-xs uppercase tracking-wider mb-2">Rooms Created</p>
+                <p className="text-text-muted text-xs uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                  <svg className="w-4 h-4 text-accent flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                  </svg>
+                  Rooms Created
+                </p>
                 <p className="text-3xl font-semibold text-text-primary">{data.rooms_created}</p>
               </div>
             </div>
