@@ -6,11 +6,13 @@ import LoadingSpinner from '../components/shared/LoadingSpinner.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
 
 function formatDuration(seconds) {
-  if (!seconds) return '0m';
+  if (!seconds || seconds === 0) return '< 1m';
   const h = Math.floor(seconds / 3600);
   const m = Math.floor((seconds % 3600) / 60);
+  const s = seconds % 60;
   if (h > 0) return `${h}h ${m}m`;
-  return `${m}m`;
+  if (m > 0) return `${m}m`;
+  return `${s}s`;
 }
 
 function formatDate(isoString) {

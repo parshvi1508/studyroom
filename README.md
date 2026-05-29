@@ -1,4 +1,5 @@
-# StudyRoom
+#  Syncora
+### Collaborative Study Room Platform 
 
 A collaborative study room platform with realtime chat, server-authoritative session
 tracking, and presence awareness.
@@ -12,7 +13,7 @@ Built as a technical assessment for Jaypee Brothers Medical Publishers.
 - Database: Supabase PostgreSQL
 - Realtime: FastAPI native WebSockets
 - Frontend: React, Vite, Tailwind CSS
-- Deployment: Azure App Service (backend), Vercel (frontend)
+- Deployment: Render (production), AWS EC2 (validated deployment), Vercel
 
 ## Live URLs
 
@@ -46,7 +47,7 @@ uvicorn app.main:app --reload --port 8000
 ### Frontend
 
 ```bash
-cd frontend
+cd studyroom-frontend
 npm install
 cp .env.example .env.local
 # Set VITE_API_URL and VITE_WS_URL in .env.local
@@ -71,7 +72,7 @@ backend/app/
 
 ### Key Design Decisions
 
-1. In-memory ConnectionManager with documented Redis upgrade path (see DECISIONS.md ADR-003)
+1. In-memory ConnectionManager designed for future Redis-based scaling.
 2. Server-authoritative session timer via UTC start_time broadcast (see ADR-004)
 3. All WebSocket messages typed as Pydantic models, never raw dicts (see ADR-007)
 4. Service layer separates business logic from route handlers (see ADR-006)
@@ -87,9 +88,20 @@ backend/app/
 - Activity log per room
 - User session history dashboard
 
+## Assessment Requirement Mapping
+
+| Requirement | Implementation |
+|------------|----------------|
+| Authentication | JWT-based user registration and login |
+| Study Room Management | Create rooms, generate unique room codes, and join rooms via code |
+| Session Timer | Server-authoritative study session timer synchronized across participants |
+| Room Chat | Real-time WebSocket-based chat with message persistence |
+| Realtime Updates | Live presence tracking and room-wide event synchronization |
+| Activity Dashboard | Session history, study statistics, and activity tracking |
+
 ## WebSocket Protocol
 
-See WS_PROTOCOL.md for the full typed message contract.
+All WebSocket communication uses typed Pydantic message models.
 
 ## Environment Variables
 
@@ -99,7 +111,7 @@ See `.env.example` for all required variables and descriptions.
 
 - Passwords hashed with bcrypt (cost factor 12)
 - JWT tokens expire after 60 minutes
-- WebSocket auth via query parameter (documented limitation, V2 mitigation described in DECISIONS.md ADR-005)
+- WebSocket authentication is performed using JWT tokens during connection establishment.
 - CORS restricted to frontend origin in production
 - No secrets committed. All config via environment variables.
 
