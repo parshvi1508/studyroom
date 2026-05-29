@@ -58,6 +58,7 @@ export default function RoomsPage() {
   }
 
   async function handleArchive(code) {
+    if (!window.confirm('Archive this room? This cannot be undone.')) return;
     try {
       const updated = await archiveRoom(code, token);
       setRooms((prev) => prev.map((r) => (r.code === code ? updated : r)));
