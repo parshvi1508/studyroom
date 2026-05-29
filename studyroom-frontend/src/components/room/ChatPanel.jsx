@@ -43,10 +43,10 @@ export default function ChatPanel({ messages, onSend }) {
         {messages.map((msg, i) => (
           <div
             key={msg.id || msg.message_id || i}
-            className={`rounded px-3 py-2 max-w-[85%] ${
+            className={`rounded px-3 py-2 max-w-[80%] ${
               isOwnMessage(msg)
                 ? 'bg-accent self-end'
-                : 'bg-bg-elevated self-start'
+                : 'bg-bg-elevated self-start border-l-2 border-accent/30'
             }`}
           >
             <div className="flex items-baseline gap-2 mb-0.5">

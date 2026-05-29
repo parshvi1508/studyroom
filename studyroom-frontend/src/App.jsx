@@ -4,6 +4,7 @@ import ProtectedRoute from './components/shared/ProtectedRoute.jsx';
 import LoginPage from './pages/LoginPage.jsx';
 import RegisterPage from './pages/RegisterPage.jsx';
 import DashboardPage from './pages/DashboardPage.jsx';
+import LandingPage from './pages/LandingPage.jsx';
 import RoomsPage from './pages/RoomsPage.jsx';
 import RoomPage from './pages/RoomPage.jsx';
 
@@ -35,11 +36,11 @@ const router = createBrowserRouter([
   },
   {
     path: '/',
-    element: <Navigate to="/rooms" replace />,
+    element: <LandingPage />,
   },
   {
     path: '*',
-    element: <Navigate to="/rooms" replace />,
+    element: <Navigate to="/" replace />,
   },
 ]);
 
