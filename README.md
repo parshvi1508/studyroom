@@ -102,3 +102,43 @@ See `.env.example` for all required variables and descriptions.
 - WebSocket auth via query parameter (documented limitation, V2 mitigation described in DECISIONS.md ADR-005)
 - CORS restricted to frontend origin in production
 - No secrets committed. All config via environment variables.
+
+## Behavior Notes
+
+These are intentional design decisions, not bugs. Documented here to avoid confusion.
+
+### Session auto-end on creator disconnect
+
+When the room creator closes their tab or navigates away, any active session is automatically
+ended by the backend (`session_service.end` is called in the WebSocket cleanup block). This
+prevents orphaned sessions that would sit as `status = "active"` forever and become invisible
+in dashboard aggregations.
+
+### Session tracking is creator-scoped
+
+The dashboard tracks study time for sessions **you started** (`started_by == user_id`). Other
+users joining your room do not receive independent study time credit. The system has no concept
+of per-participant session attribution -- only the creator who ran the session is credited.
+This is a deliberate scope decision for v1 and is consistent with the assessment requirements.
+
+### Chat and session are independent
+
+Ending a session stops the study timer and writes `duration_seconds` to the DB. It does not
+disconnect users or clear chat. After ending a session, participants remain in the room and
+can continue chatting. This is intentional -- the session represents a focused study block;
+the chat is persistent room infrastructure.
+
+### How to verify dashboard study time
+
+1. Create a room
+2. Join it
+3. Click **Start Session** (creator only)
+4. Wait a minute
+5. Click **End Session**
+6. Navigate to Dashboard
+
+The "Study Time" stat will reflect the session duration. Sessions abandoned without clicking
+End Session are counted in `session_count` (any status) but contribute `0` to `total_study_seconds`
+(ended-only sum), which is the correct behavior -- incomplete sessions are acknowledged but
+not credited as study time.
+

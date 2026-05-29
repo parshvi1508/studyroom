@@ -154,7 +154,9 @@ export default function RoomsPage() {
             <div
               key={room.id}
               className={`bg-bg-surface border rounded-lg p-4 flex items-center gap-4 transition-colors ${
-                room.is_active ? 'border-bg-border hover:border-accent/40' : 'border-bg-border opacity-50'
+                room.is_active
+                  ? 'border-bg-border hover:border-accent/40 hover:border-l-accent hover:border-l-2 hover:bg-accent/5'
+                  : 'border-bg-border opacity-50'
               }`}
             >
               <div className="flex-1 min-w-0">
