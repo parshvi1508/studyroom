@@ -45,15 +45,21 @@ export default function ChatPanel({ messages, onSend }) {
             key={msg.id || msg.message_id || i}
             className={`rounded px-3 py-2 max-w-[85%] ${
               isOwnMessage(msg)
-                ? 'bg-accent/10 border border-accent/20 self-end'
+                ? 'bg-accent self-end'
                 : 'bg-bg-elevated self-start'
             }`}
           >
             <div className="flex items-baseline gap-2 mb-0.5">
-              <span className="text-xs font-medium text-accent">{msg.display_name}</span>
-              <span className="text-xs text-text-muted">{formatTime(msg.sent_at)}</span>
+              <span className={`text-xs font-medium ${
+                isOwnMessage(msg) ? 'text-white/80' : 'text-accent'
+              }`}>{msg.display_name}</span>
+              <span className={`text-xs ${
+                isOwnMessage(msg) ? 'text-white/60' : 'text-text-muted'
+              }`}>{formatTime(msg.sent_at)}</span>
             </div>
-            <p className="text-sm text-text-primary break-words">{msg.content}</p>
+            <p className={`text-sm break-words ${
+              isOwnMessage(msg) ? 'text-white' : 'text-text-primary'
+            }`}>{msg.content}</p>
           </div>
         ))}
         <div ref={bottomRef} />
