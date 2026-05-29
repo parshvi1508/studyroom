@@ -153,4 +153,28 @@ class RoomService:
         return self._build_response(room, creator_display_name)
 
 
+    async def delete(
+        self,
+        session: AsyncSession,
+        code: str,
+        creator_id: uuid.UUID,
+    ) -> Optional[bool]:
+        """Delete a room by code. Creator only.
+
+        Returns True if deleted, None if not found.
+        Raises PermissionError if caller is not the creator.
+        """
+        stmt = select(Room).where(Room.code == code)
+        result = await session.execute(stmt)
+        room = result.scalar_one_or_none()
+        if room is None:
+            return None
+        if room.creator_id != creator_id:
+            raise PermissionError("Only the room creator can delete this room")
+        await session.delete(room)
+        await session.flush()
+        logger.info("Room deleted: code=%s, creator=%s", code, creator_id)
+        return True
+
+
 room_service = RoomService()

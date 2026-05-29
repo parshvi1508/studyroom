@@ -10,11 +10,13 @@ from app.core.database import get_db
 from app.routes.auth import get_current_user_id
 from app.schemas.room import (
     ActiveSessionResponse,
+    ActivityLogResponse,
     CreateRoomRequest,
     MessageResponse,
     RoomResponse,
     UpdateRoomRequest,
 )
+from app.services.activity_service import activity_service
 from app.services.message_service import message_service
 from app.services.room_service import room_service
 from app.services.session_service import session_service
@@ -144,3 +146,54 @@ async def get_active_session(
         started_by=active.started_by,
         start_time=active.start_time,
     )
+
+
+@router.get("/{code}/activity", response_model=list[ActivityLogResponse])
+async def get_activity(
+    code: str,
+    user_id: uuid.UUID = Depends(get_current_user_id),
+    db: AsyncSession = Depends(get_db),
+) -> list[ActivityLogResponse]:
+    """Return the 100 most recent activity log entries for a room, oldest first."""
+    room = await room_service.get_by_code(session=db, code=code)
+    if room is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Room not found",
+        )
+    rows = await activity_service.get_recent(session=db, room_id=room.id)
+    return [
+        ActivityLogResponse(
+            id=row.id,
+            user_id=row.user_id,
+            event_type=row.event_type,
+            event_metadata=row.event_metadata,
+            occurred_at=row.occurred_at,
+        )
+        for row in rows
+    ]
+
+
+@router.delete("/{code}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_room(
+    code: str,
+    user_id: uuid.UUID = Depends(get_current_user_id),
+    db: AsyncSession = Depends(get_db),
+) -> None:
+    """Delete a room by code. Creator only."""
+    try:
+        result = await room_service.delete(
+            session=db,
+            code=code,
+            creator_id=user_id,
+        )
+    except PermissionError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail=str(exc),
+        )
+    if result is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Room not found",
+        )
