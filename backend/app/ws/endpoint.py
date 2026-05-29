@@ -253,6 +253,15 @@ async def websocket_endpoint(
             await session_service.log_user_left(db, room.id, user_id)
             await db.commit()
 
+        if room.creator_id == user_id:
+            try:
+                async with async_session_factory() as db:
+                    await session_service.end(db, room.id, user_id)
+                    await db.commit()
+                    logger.info("Auto-ended session on creator disconnect: room=%s", room_code)
+            except ValueError:
+                pass
+
         await manager.broadcast_to_room(
             room_code,
             UserLeftEvent(

@@ -1,0 +1,40 @@
+import { Link, useNavigate } from 'react-router-dom';
+import { register as apiRegister } from '../api/auth.js';
+import AuthForm from '../components/auth/AuthForm.jsx';
+import { useAuth } from '../context/AuthContext.jsx';
+
+export default function RegisterPage() {
+  const { login } = useAuth();
+  const navigate = useNavigate();
+
+  async function handleSubmit({ email, password, display_name }) {
+    const data = await apiRegister(email, password, display_name);
+    login(data.access_token);
+    navigate('/rooms');
+  }
+
+  return (
+    <div className="min-h-screen bg-bg-base flex items-center justify-center px-4">
+      <div className="w-full max-w-sm bg-bg-surface border border-bg-border rounded-lg p-6 sm:p-8">
+        <div className="text-center mb-8">
+          <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-accent/10 border border-accent/20 mb-4">
+            <svg className="w-6 h-6 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+            </svg>
+          </div>
+          <h1 className="text-xl font-semibold text-text-primary">StudyRoom</h1>
+          <p className="text-text-muted text-sm mt-1">Create your account</p>
+        </div>
+
+        <AuthForm mode="register" onSubmit={handleSubmit} />
+
+        <p className="text-center text-sm text-text-muted mt-6">
+          Already have an account?{' '}
+          <Link to="/login" className="text-accent hover:text-accent-hover transition-colors">
+            Sign in
+          </Link>
+        </p>
+      </div>
+    </div>
+  );
+}
