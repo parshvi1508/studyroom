@@ -142,3 +142,7 @@ End Session are counted in `session_count` (any status) but contribute `0` to `t
 (ended-only sum), which is the correct behavior -- incomplete sessions are acknowledged but
 not credited as study time.
 
+## Deployment
+Primary backend deployment was completed on AWS EC2 using FastAPI + systemd. For submission/demo, a Render deployment is provided to ensure HTTPS compatibility with the Vercel frontend without requiring custom-domain DNS propagation.
+AWS Deployment: http://3.111.23.173:8000/docs
+Deployed project: https://studyroom-syncora.vercel.app/
